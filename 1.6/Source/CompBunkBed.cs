@@ -93,6 +93,13 @@ namespace BunkBeds
         public int BunkBedLevel => Props.pawnCount - 1;
         public List<Graphic> topGraphics;
         private Graphic originalGraphic;
+        public CompAssignableToPawn cachedCompAssignableToPawn;
+
+        public override void PostPostMake()
+        {
+            base.PostPostMake();
+            InitializeComps();
+        }
 
         public override void PostSpawnSetup(bool respawningAfterLoad)
         {
@@ -105,7 +112,21 @@ namespace BunkBeds
             base.PostDeSpawn(map, mode);
             bunkBeds.Remove(parent.thingIDNumber);
         }
-        
+
+        public override void PostExposeData()
+        {
+            base.PostExposeData();
+            if (Scribe.mode == LoadSaveMode.LoadingVars)
+                InitializeComps();
+        }
+
+        private void InitializeComps()
+        {
+            // Initialize from PostPostMake and PostExposeData, as it guarantees
+            // the comp is cached even for minified beds (in case it ever matters).
+            cachedCompAssignableToPawn = parent.GetComp<CompAssignableToPawn>();
+        }
+
         public override void PostDraw()
         {
             base.PostDraw();
@@ -276,7 +297,7 @@ namespace BunkBeds
         {
             base.DrawGUIOverlay();
             var bed = parent as Building_Bed;
-            if (bed.Medical || Find.CameraDriver.CurrentZoom != 0 || !bed.PlayerCanSeeOwners)
+            if (bed.Medical || Find.CameraDriver.CurrentZoom != 0 || !cachedCompAssignableToPawn.PlayerCanSeeAssignments)
             {
                 return;
             }

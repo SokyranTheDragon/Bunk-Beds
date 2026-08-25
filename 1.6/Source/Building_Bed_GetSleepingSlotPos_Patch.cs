@@ -9,12 +9,12 @@ namespace BunkBeds
     {
         public static void Prefix(Building_Bed __instance)
         {
-            BedUtility_GetSleepingSlotsCount_Patch.dictBunkBedComps[Thread.CurrentThread.ManagedThreadId] = __instance.GetComp<CompBunkBed>();
+            BedUtility_GetSleepingSlotsCount_Patch.bunkBedComp = __instance.GetComp<CompBunkBed>();
         }
 
         public static void Postfix()
         {
-            BedUtility_GetSleepingSlotsCount_Patch.dictBunkBedComps[Thread.CurrentThread.ManagedThreadId] = null;
+            BedUtility_GetSleepingSlotsCount_Patch.bunkBedComp = null;
         }
     }
 }

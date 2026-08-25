@@ -20,9 +20,9 @@ namespace BunkBeds
 
         public override string SettingsCategory()
         {
-            if (ModsConfig.IsActive("Darknote.BunkBeds"))
+            if (ModLister.AllModsActiveNoSuffix(["Darknote.BunkBeds"]))
             {
-                return Content.Name;
+                return "Bunk Beds";
             }
             return "";
         }

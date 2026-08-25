@@ -13,6 +13,8 @@ namespace BunkBeds
     public static class Building_Bed_DrawGUIOverlay_Patch
     {
         public static Type guestBedType;
+        private static AccessTools.FieldRef<Building_Bed, int> hospitalityRentalFeeField;
+
         public static IEnumerable<MethodBase> TargetMethods()
         {
             yield return AccessTools.Method(typeof(Building_Bed), nameof(Building_Bed.DrawGUIOverlay));
@@ -22,6 +24,7 @@ namespace BunkBeds
                 var guestMethod = AccessTools.Method(guestBedType, "DrawGUIOverlay");
                 if (guestMethod != null)
                 {
+                    hospitalityRentalFeeField = AccessTools.FieldRefAccess<int>(guestBedType, "rentalFee");
                     yield return guestMethod;
                 }
             }
@@ -37,11 +40,10 @@ namespace BunkBeds
                     if (Find.CameraDriver.CurrentZoom == CameraZoomRange.Closest)
                     {
                         var defaultThingLabelColor = GenMapUI.DefaultThingLabelColor;
-                        var owners = __instance.CompAssignableToPawn.AssignedPawnsForReading.Where(x => x != null);
+                        var owners = comp.cachedCompAssignableToPawn.AssignedPawnsForReading.Where(x => x != null);
                         if (!owners.Any())
                         {
-                            var rentalFee = (int)Traverse.Create(__instance).Field("rentalFee").GetValue();
-                            GenMapUI.DrawThingLabel(__instance, ((float)rentalFee).ToStringMoney(), defaultThingLabelColor);
+                            GenMapUI.DrawThingLabel(__instance, ((float)hospitalityRentalFeeField(__instance)).ToStringMoney(), defaultThingLabelColor);
                         }
                     }
                 }

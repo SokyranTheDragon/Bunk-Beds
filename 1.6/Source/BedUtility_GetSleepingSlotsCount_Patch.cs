@@ -1,21 +1,20 @@
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System;
 using HarmonyLib;
 using RimWorld;
-using System.Threading;
 
 namespace BunkBeds
 {
     [HarmonyPatch(typeof(BedUtility), "GetSleepingSlotsCount")]
     public static class BedUtility_GetSleepingSlotsCount_Patch
     {
-        public static ConcurrentDictionary<int, CompBunkBed> dictBunkBedComps = new();
+        [ThreadStatic]
+        public static CompBunkBed bunkBedComp;
 
         public static bool Prefix(ref int __result)
         {
-            if (dictBunkBedComps.GetValueOrDefault(Thread.CurrentThread.ManagedThreadId, null) == null)
+            if (bunkBedComp == null)
                 return true;
-            __result = dictBunkBedComps[Thread.CurrentThread.ManagedThreadId].Props.pawnCount;
+            __result = bunkBedComp.Props.pawnCount;
             return false;
         }
     }
